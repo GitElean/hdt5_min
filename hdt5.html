@@ -357,16 +357,1617 @@ display: none;
 </div>
 
 
-<p>library(caret)</p>
-<div id="dividiendo-la-data-en-test-y-train" class="section level2">
-<h2>Dividiendo la data en test y train</h2>
-<p>set.seed(123) data &lt;- read.csv(“train.csv”)</p>
+<div id="use-los-mismos-conjuntos-de-entrenamiento-y-prueba-que-utilizó-en-las-dos-hojas-anteriores." class="section level3">
+<h3>1. Use los mismos conjuntos de entrenamiento y prueba que utilizó en
+las dos hojas anteriores.</h3>
+<pre class="r"><code>#Librerias a utilizar
+library(e1071)
+library(caret)</code></pre>
+<pre><code>## Loading required package: ggplot2</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre class="r"><code>library(magrittr)
+library(plyr)
+library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:plyr&#39;:
+## 
+##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+##     summarize</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>library(cluster)
+library(mclust)</code></pre>
+<pre><code>## Package &#39;mclust&#39; version 6.0.0
+## Type &#39;citation(&quot;mclust&quot;)&#39; for citing this R package in publications.</code></pre>
+<pre class="r"><code>library(fpc)
+library(NbClust)
+library(factoextra)</code></pre>
+<pre><code>## Welcome! Want to learn more? See two factoextra-related books at https://goo.gl/ve3WBa</code></pre>
+<pre class="r"><code>library(readr)
+library(ppclust)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;ppclust&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:fpc&#39;:
+## 
+##     plotcluster</code></pre>
+<pre class="r"><code>library(randomForest)</code></pre>
+<pre><code>## randomForest 4.7-1.1</code></pre>
+<pre><code>## Type rfNews() to see new features/changes/bug fixes.</code></pre>
+<pre><code>## 
+## Attaching package: &#39;randomForest&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     combine</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     margin</code></pre>
+<pre class="r"><code>library(ggplot2)
+library(broom)
+library(ggpubr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;ggpubr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:plyr&#39;:
+## 
+##     mutate</code></pre>
+<pre class="r"><code>library(corrplot)</code></pre>
+<pre><code>## corrplot 0.92 loaded</code></pre>
+<pre class="r"><code>library(mctest)
+library(Amelia)</code></pre>
+<pre><code>## Loading required package: Rcpp</code></pre>
+<pre><code>## ## 
+## ## Amelia II: Multiple Imputation
+## ## (Version 1.8.1, built: 2022-11-18)
+## ## Copyright (C) 2005-2023 James Honaker, Gary King and Matthew Blackwell
+## ## Refer to http://gking.harvard.edu/amelia/ for more information
+## ##</code></pre>
+<pre class="r"><code>library(caretEnsemble)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;caretEnsemble&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     autoplot</code></pre>
+<pre class="r"><code>library(psych)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;psych&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:randomForest&#39;:
+## 
+##     outlier</code></pre>
+<pre><code>## The following object is masked from &#39;package:ppclust&#39;:
+## 
+##     pca</code></pre>
+<pre><code>## The following object is masked from &#39;package:mclust&#39;:
+## 
+##     sim</code></pre>
+<pre><code>## The following objects are masked from &#39;package:ggplot2&#39;:
+## 
+##     %+%, alpha</code></pre>
+<pre class="r"><code>library(mice)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;mice&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     cbind, rbind</code></pre>
+<pre class="r"><code>library(GGally)</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;GGally&#39;:
+##   method from   
+##   +.gg   ggplot2</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ forcats   1.0.0     ✔ stringr   1.5.0
+## ✔ lubridate 1.9.2     ✔ tibble    3.1.8
+## ✔ purrr     1.0.1     ✔ tidyr     1.3.0</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ psych::%+%()              masks ggplot2::%+%()
+## ✖ psych::alpha()            masks ggplot2::alpha()
+## ✖ dplyr::arrange()          masks plyr::arrange()
+## ✖ caretEnsemble::autoplot() masks ggplot2::autoplot()
+## ✖ randomForest::combine()   masks dplyr::combine()
+## ✖ purrr::compact()          masks plyr::compact()
+## ✖ dplyr::count()            masks plyr::count()
+## ✖ dplyr::desc()             masks plyr::desc()
+## ✖ tidyr::extract()          masks magrittr::extract()
+## ✖ dplyr::failwith()         masks plyr::failwith()
+## ✖ mice::filter()            masks dplyr::filter(), stats::filter()
+## ✖ dplyr::id()               masks plyr::id()
+## ✖ dplyr::lag()              masks stats::lag()
+## ✖ purrr::lift()             masks caret::lift()
+## ✖ purrr::map()              masks mclust::map()
+## ✖ randomForest::margin()    masks ggplot2::margin()
+## ✖ ggpubr::mutate()          masks dplyr::mutate(), plyr::mutate()
+## ✖ dplyr::rename()           masks plyr::rename()
+## ✖ purrr::set_names()        masks magrittr::set_names()
+## ✖ dplyr::summarise()        masks plyr::summarise()
+## ✖ dplyr::summarize()        masks plyr::summarize()
+## ℹ Use the ]8;;http://conflicted.r-lib.org/conflicted package]8;; to force all conflicts to become errors</code></pre>
+<pre class="r"><code>library(rpart)
+library(h2o)</code></pre>
+<pre><code>## 
+## ----------------------------------------------------------------------
+## 
+## Your next step is to start H2O:
+##     &gt; h2o.init()
+## 
+## For H2O package documentation, ask for help:
+##     &gt; ??h2o
+## 
+## After starting H2O, you can use the Web UI at http://localhost:54321
+## For more information visit https://docs.h2o.ai
+## 
+## ----------------------------------------------------------------------
+## 
+## 
+## Attaching package: &#39;h2o&#39;
+## 
+## The following objects are masked from &#39;package:lubridate&#39;:
+## 
+##     day, hour, month, week, year
+## 
+## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     cor, sd, var
+## 
+## The following objects are masked from &#39;package:base&#39;:
+## 
+##     %*%, %in%, &amp;&amp;, ||, apply, as.factor, as.numeric, colnames,
+##     colnames&lt;-, ifelse, is.character, is.factor, is.numeric, log,
+##     log10, log1p, log2, round, signif, trunc</code></pre>
+<pre class="r"><code>#base de datos a utilzar
+datos &lt;- read.csv(&quot;train.csv&quot;)
+datosCasas &lt;- datos[,-c(1,7)]</code></pre>
 </div>
-<div id="partimos-el-dataset-en-training-65-y-testing-35" class="section level1">
-<h1>partimos el dataset en training (65%) y testing (35%)</h1>
-<p>trainIndex &lt;- createDataPartition(data$target_variable, p = 0.65,
-list = FALSE) training_data &lt;- data[trainIndex, ] testing_data &lt;-
-data[-trainIndex, ]</p>
+<div id="elabore-un-modelo-de-bayes-ingenuo-naive-bayes-utilizando-el-conjunto-de-entrenamiento-y-explique-los-resultados-a-los-que-llega.-el-experimento-debe-ser-reproducible-por-lo-que-debe-fijar-que-los-conjuntos-de-entrenamiento-y-prueba-sean-los-mismos-siempre-que-se-ejecute-el-código." class="section level3">
+<h3>2. Elabore un modelo de bayes ingenuo (naive bayes) utilizando el
+conjunto de entrenamiento y explique los resultados a los que llega. El
+experimento debe ser reproducible por lo que debe fijar que los
+conjuntos de entrenamiento y prueba sean los mismos siempre que se
+ejecute el código.</h3>
+</div>
+<div id="haga-un-modelo-de-clasificacion-use-la-variable-categórica-que-hizo-con-el-precio-de-las-casas" class="section level3">
+<h3>3. Haga un modelo de clasificacion, use la variable categórica que
+hizo con el precio de las casas</h3>
+<pre><code>## 
+## Naive Bayes Classifier for Discrete Predictors
+## 
+## Call:
+## naiveBayes.default(x = X, y = Y, laplace = laplace)
+## 
+## A-priori probabilities:
+## Y
+##       Caras  Economicas Intermedias 
+##  0.00489716  0.85014691  0.14495593 
+## 
+## Conditional probabilities:
+##              MSSubClass
+## Y                 [,1]     [,2]
+##   Caras       44.00000 21.90890
+##   Economicas  57.25806 43.25062
+##   Intermedias 49.08784 29.67532
+## 
+##              MSZoning
+## Y                 C (all)          FV          RH          RL          RM
+##   Caras       0.000000000 0.000000000 0.000000000 1.000000000 0.000000000
+##   Economicas  0.006912442 0.039170507 0.014976959 0.782258065 0.156682028
+##   Intermedias 0.000000000 0.067567568 0.000000000 0.898648649 0.033783784
+## 
+##              LotFrontage
+## Y                  [,1]     [,2]
+##   Caras       110.80000 28.64786
+##   Economicas   68.11698 20.20448
+##   Intermedias  82.84425 21.54568
+## 
+##              LotArea
+## Y                  [,1]      [,2]
+##   Caras       16312.800  3166.567
+##   Economicas   9748.217  7404.933
+##   Intermedias 14213.615 14156.746
+## 
+##              Street
+## Y                    Grvl        Pave
+##   Caras       0.000000000 1.000000000
+##   Economicas  0.003456221 0.996543779
+##   Intermedias 0.000000000 1.000000000
+## 
+##              LotShape
+## Y                     IR1         IR2         IR3         Reg
+##   Caras       0.800000000 0.000000000 0.000000000 0.200000000
+##   Economicas  0.312211982 0.025345622 0.004608295 0.657834101
+##   Intermedias 0.466216216 0.033783784 0.013513514 0.486486486
+## 
+##              LandContour
+## Y                     Bnk         HLS         Low         Lvl
+##   Caras       0.000000000 0.000000000 0.000000000 1.000000000
+##   Economicas  0.049539171 0.032258065 0.024193548 0.894009217
+##   Intermedias 0.006756757 0.081081081 0.054054054 0.858108108
+## 
+##              Utilities
+## Y                  AllPub      NoSeWa
+##   Caras       1.000000000 0.000000000
+##   Economicas  0.998847926 0.001152074
+##   Intermedias 1.000000000 0.000000000
+## 
+##              LotConfig
+## Y                  Corner     CulDSac         FR2         FR3      Inside
+##   Caras       0.400000000 0.000000000 0.000000000 0.000000000 0.600000000
+##   Economicas  0.177419355 0.049539171 0.041474654 0.002304147 0.729262673
+##   Intermedias 0.168918919 0.114864865 0.020270270 0.000000000 0.695945946
+## 
+##              LandSlope
+## Y                     Gtl         Mod         Sev
+##   Caras       1.000000000 0.000000000 0.000000000
+##   Economicas  0.951612903 0.040322581 0.008064516
+##   Intermedias 0.891891892 0.094594595 0.013513514
+## 
+##              Neighborhood
+## Y                 Blmngtn     Blueste      BrDale     BrkSide     ClearCr
+##   Caras       0.000000000 0.000000000 0.000000000 0.000000000 0.000000000
+##   Economicas  0.014976959 0.001152074 0.011520737 0.036866359 0.018433180
+##   Intermedias 0.006756757 0.000000000 0.000000000 0.000000000 0.027027027
+##              Neighborhood
+## Y                 CollgCr     Crawfor     Edwards     Gilbert      IDOTRR
+##   Caras       0.000000000 0.000000000 0.000000000 0.000000000 0.000000000
+##   Economicas  0.105990783 0.032258065 0.084101382 0.059907834 0.026497696
+##   Intermedias 0.074324324 0.054054054 0.006756757 0.013513514 0.000000000
+##              Neighborhood
+## Y                 MeadowV     Mitchel       NAmes     NoRidge     NPkVill
+##   Caras       0.000000000 0.000000000 0.000000000 0.400000000 0.000000000
+##   Economicas  0.011520737 0.043778802 0.170506912 0.005760369 0.008064516
+##   Intermedias 0.000000000 0.000000000 0.013513514 0.148648649 0.000000000
+##              Neighborhood
+## Y                 NridgHt      NWAmes     OldTown      Sawyer     SawyerW
+##   Caras       0.400000000 0.000000000 0.000000000 0.000000000 0.000000000
+##   Economicas  0.016129032 0.052995392 0.081797235 0.071428571 0.046082949
+##   Intermedias 0.277027027 0.020270270 0.027027027 0.000000000 0.033783784
+##              Neighborhood
+## Y                 Somerst     StoneBr       SWISU      Timber     Veenker
+##   Caras       0.000000000 0.200000000 0.000000000 0.000000000 0.000000000
+##   Economicas  0.048387097 0.006912442 0.018433180 0.019585253 0.006912442
+##   Intermedias 0.121621622 0.074324324 0.000000000 0.081081081 0.020270270
+## 
+##              Condition1
+## Y                  Artery       Feedr        Norm        PosA        PosN
+##   Caras       0.000000000 0.000000000 1.000000000 0.000000000 0.000000000
+##   Economicas  0.029953917 0.064516129 0.855990783 0.005760369 0.012672811
+##   Intermedias 0.013513514 0.000000000 0.918918919 0.006756757 0.027027027
+##              Condition1
+## Y                    RRAe        RRAn        RRNe        RRNn
+##   Caras       0.000000000 0.000000000 0.000000000 0.000000000
+##   Economicas  0.012672811 0.014976959 0.002304147 0.001152074
+##   Intermedias 0.000000000 0.020270270 0.000000000 0.013513514
+## 
+##              Condition2
+## Y                  Artery       Feedr        Norm        PosA        PosN
+##   Caras       0.000000000 0.000000000 1.000000000 0.000000000 0.000000000
+##   Economicas  0.001152074 0.003456221 0.991935484 0.000000000 0.001152074
+##   Intermedias 0.000000000 0.000000000 0.986486486 0.006756757 0.006756757
+##              Condition2
+## Y                    RRAn        RRNn
+##   Caras       0.000000000 0.000000000
+##   Economicas  0.001152074 0.001152074
+##   Intermedias 0.000000000 0.000000000
+## 
+##              BldgType
+## Y                   1Fam     2fmCon     Duplex      Twnhs     TwnhsE
+##   Caras       1.00000000 0.00000000 0.00000000 0.00000000 0.00000000
+##   Economicas  0.82027650 0.02304147 0.04262673 0.02419355 0.08986175
+##   Intermedias 0.91891892 0.00000000 0.00000000 0.00000000 0.08108108
+## 
+##              HouseStyle
+## Y                  1.5Fin      1.5Unf      1Story      2.5Fin      2.5Unf
+##   Caras       0.000000000 0.000000000 0.400000000 0.000000000 0.000000000
+##   Economicas  0.114055300 0.011520737 0.517281106 0.003456221 0.005760369
+##   Intermedias 0.033783784 0.000000000 0.506756757 0.013513514 0.006756757
+##              HouseStyle
+## Y                  2Story      SFoyer        SLvl
+##   Caras       0.600000000 0.000000000 0.000000000
+##   Economicas  0.274193548 0.026497696 0.047235023
+##   Intermedias 0.425675676 0.000000000 0.013513514
+## 
+##              OverallQual
+## Y                 [,1]      [,2]
+##   Caras       9.600000 0.5477226
+##   Economicas  5.768433 1.1459044
+##   Intermedias 8.000000 0.9404008
+## 
+##              OverallCond
+## Y                 [,1]      [,2]
+##   Caras       5.200000 0.4472136
+##   Economicas  5.574885 1.1036965
+##   Intermedias 5.358108 1.0034643
+## 
+##              YearBuilt
+## Y                 [,1]     [,2]
+##   Caras       2002.400  6.94982
+##   Economicas  1968.018 28.86131
+##   Intermedias 1994.480 22.71607
+## 
+##              YearRemodAdd
+## Y                 [,1]     [,2]
+##   Caras       2003.000  7.00000
+##   Economicas  1982.069 20.72141
+##   Intermedias 2001.149  8.77796
+## 
+##              RoofStyle
+## Y                    Flat       Gable     Gambrel         Hip     Mansard
+##   Caras       0.000000000 0.200000000 0.000000000 0.800000000 0.000000000
+##   Economicas  0.006912442 0.831797235 0.008064516 0.150921659 0.002304147
+##   Intermedias 0.020270270 0.500000000 0.006756757 0.466216216 0.000000000
+##              RoofStyle
+## Y                    Shed
+##   Caras       0.000000000
+##   Economicas  0.000000000
+##   Intermedias 0.006756757
+## 
+##              RoofMatl
+## Y                 ClyTile     CompShg       Metal        Roll     Tar&amp;Grv
+##   Caras       0.000000000 0.800000000 0.000000000 0.000000000 0.000000000
+##   Economicas  0.001152074 0.987327189 0.001152074 0.001152074 0.005760369
+##   Intermedias 0.000000000 0.952702703 0.000000000 0.000000000 0.020270270
+##              RoofMatl
+## Y                 WdShake     WdShngl
+##   Caras       0.000000000 0.200000000
+##   Economicas  0.002304147 0.001152074
+##   Intermedias 0.006756757 0.020270270
+## 
+##              Exterior1st
+## Y                 AsbShng     AsphShn     BrkComm     BrkFace      CBlock
+##   Caras       0.000000000 0.000000000 0.000000000 0.000000000 0.000000000
+##   Economicas  0.017281106 0.001152074 0.002304147 0.028801843 0.001152074
+##   Intermedias 0.000000000 0.000000000 0.000000000 0.054054054 0.000000000
+##              Exterior1st
+## Y                 CemntBd     HdBoard     ImStucc     MetalSd     Plywood
+##   Caras       0.200000000 0.200000000 0.000000000 0.000000000 0.000000000
+##   Economicas  0.026497696 0.167050691 0.000000000 0.157834101 0.082949309
+##   Intermedias 0.114864865 0.060810811 0.006756757 0.081081081 0.054054054
+##              Exterior1st
+## Y                   Stone      Stucco     VinylSd     Wd Sdng     WdShing
+##   Caras       0.000000000 0.000000000 0.400000000 0.200000000 0.000000000
+##   Economicas  0.001152074 0.018433180 0.322580645 0.154377880 0.018433180
+##   Intermedias 0.000000000 0.013513514 0.554054054 0.054054054 0.006756757
+## 
+##              Exterior2nd
+## Y                 AsbShng     AsphShn     Brk Cmn     BrkFace      CBlock
+##   Caras       0.000000000 0.000000000 0.000000000 0.000000000 0.000000000
+##   Economicas  0.013824885 0.001152074 0.006912442 0.010368664 0.001152074
+##   Intermedias 0.000000000 0.000000000 0.000000000 0.027027027 0.000000000
+##              Exterior2nd
+## Y                 CmentBd     HdBoard     ImStucc     MetalSd     Plywood
+##   Caras       0.200000000 0.200000000 0.200000000 0.000000000 0.000000000
+##   Economicas  0.025345622 0.153225806 0.005760369 0.152073733 0.108294931
+##   Intermedias 0.114864865 0.074324324 0.020270270 0.081081081 0.047297297
+##              Exterior2nd
+## Y                   Stone      Stucco     VinylSd     Wd Sdng     Wd Shng
+##   Caras       0.000000000 0.000000000 0.400000000 0.000000000 0.000000000
+##   Economicas  0.004608295 0.020737327 0.313364055 0.150921659 0.032258065
+##   Intermedias 0.000000000 0.006756757 0.547297297 0.067567568 0.013513514
+## 
+##              MasVnrArea
+## Y                  [,1]     [,2]
+##   Caras       467.60000 483.8686
+##   Economicas   72.32811 144.0821
+##   Intermedias 250.63514 232.8741
+## 
+##              ExterQual
+## Y                      Ex          Fa          Gd          TA
+##   Caras       0.600000000 0.000000000 0.400000000 0.000000000
+##   Economicas  0.006912442 0.011520737 0.276497696 0.705069124
+##   Intermedias 0.189189189 0.000000000 0.729729730 0.081081081
+## 
+##              ExterCond
+## Y                      Ex          Fa          Gd          Po          TA
+##   Caras       0.000000000 0.000000000 0.000000000 0.000000000 1.000000000
+##   Economicas  0.001152074 0.025345622 0.101382488 0.001152074 0.870967742
+##   Intermedias 0.006756757 0.000000000 0.074324324 0.000000000 0.918918919
+## 
+##              Foundation
+## Y                  BrkTil      CBlock       PConc        Slab       Stone
+##   Caras       0.000000000 0.000000000 1.000000000 0.000000000 0.000000000
+##   Economicas  0.104838710 0.490783410 0.376728111 0.019585253 0.004608295
+##   Intermedias 0.027027027 0.114864865 0.858108108 0.000000000 0.000000000
+##              Foundation
+## Y                    Wood
+##   Caras       0.000000000
+##   Economicas  0.003456221
+##   Intermedias 0.000000000
+## 
+##              BsmtFinSF1
+## Y                  [,1]     [,2]
+##   Caras       1549.2000 786.9833
+##   Economicas   391.3099 418.7023
+##   Intermedias  764.2095 557.0853
+## 
+##              BsmtFinSF2
+## Y                  [,1]     [,2]
+##   Caras       107.80000 241.0481
+##   Economicas   50.69700 158.0965
+##   Intermedias  32.37838 183.2304
+## 
+##              BsmtUnfSF
+## Y                 [,1]     [,2]
+##   Caras       794.2000 637.3705
+##   Economicas  539.3111 415.2117
+##   Intermedias 726.0608 539.0468
+## 
+##              TotalBsmtSF
+## Y                 [,1]     [,2]
+##   Caras       2451.200 400.5761
+##   Economicas   981.318 391.7169
+##   Intermedias 1522.649 351.6452
+## 
+##              Heating
+## Y                   Floor        GasA        GasW        Grav        OthW
+##   Caras       0.000000000 1.000000000 0.000000000 0.000000000 0.000000000
+##   Economicas  0.001152074 0.974654378 0.011520737 0.006912442 0.002304147
+##   Intermedias 0.000000000 0.993243243 0.006756757 0.000000000 0.000000000
+##              Heating
+## Y                    Wall
+##   Caras       0.000000000
+##   Economicas  0.003456221
+##   Intermedias 0.000000000
+## 
+##              HeatingQC
+## Y                      Ex          Fa          Gd          Po          TA
+##   Caras       1.000000000 0.000000000 0.000000000 0.000000000 0.000000000
+##   Economicas  0.456221198 0.046082949 0.164746544 0.001152074 0.331797235
+##   Intermedias 0.871621622 0.000000000 0.054054054 0.000000000 0.074324324
+## 
+##              CentralAir
+## Y                      N          Y
+##   Caras       0.00000000 1.00000000
+##   Economicas  0.07373272 0.92626728
+##   Intermedias 0.00000000 1.00000000
+## 
+##              Electrical
+## Y                   FuseA       FuseF       FuseP       SBrkr
+##   Caras       0.000000000 0.000000000 0.000000000 1.000000000
+##   Economicas  0.072664360 0.020761246 0.003460208 0.903114187
+##   Intermedias 0.000000000 0.000000000 0.000000000 1.000000000
+## 
+##              X1stFlrSF
+## Y                 [,1]     [,2]
+##   Caras       2322.600 186.9941
+##   Economicas  1092.720 335.2814
+##   Intermedias 1583.899 327.3812
+## 
+##              X2ndFlrSF
+## Y                 [,1]     [,2]
+##   Caras       962.6000 987.7995
+##   Economicas  297.4793 388.8956
+##   Intermedias 537.9054 578.0698
+## 
+##              LowQualFinSF
+## Y                 [,1]     [,2]
+##   Caras       0.000000  0.00000
+##   Economicas  6.594470 51.73724
+##   Intermedias 3.864865 47.01811
+## 
+##              GrLivArea
+## Y                 [,1]      [,2]
+##   Caras       3285.200 1034.8020
+##   Economicas  1396.794  437.1750
+##   Intermedias 2125.669  477.4251
+## 
+##              BsmtFullBath
+## Y                  [,1]      [,2]
+##   Caras       0.6000000 0.5477226
+##   Economicas  0.3928571 0.5117261
+##   Intermedias 0.6689189 0.5001838
+## 
+##              BsmtHalfBath
+## Y                   [,1]      [,2]
+##   Caras       0.20000000 0.4472136
+##   Economicas  0.05414747 0.2314766
+##   Intermedias 0.02027027 0.1414019
+## 
+##              FullBath
+## Y                 [,1]      [,2]
+##   Caras       2.600000 0.5477226
+##   Economicas  1.480415 0.5333914
+##   Intermedias 2.006757 0.3954954
+## 
+##              HalfBath
+## Y                  [,1]      [,2]
+##   Caras       0.8000000 0.4472136
+##   Economicas  0.3479263 0.4932372
+##   Intermedias 0.5337838 0.5005513
+## 
+##              BedroomAbvGr
+## Y                 [,1]      [,2]
+##   Caras       3.200000 1.0954451
+##   Economicas  2.829493 0.7868329
+##   Intermedias 3.006757 0.9147069
+## 
+##              KitchenAbvGr
+## Y                 [,1]      [,2]
+##   Caras       1.000000 0.0000000
+##   Economicas  1.058756 0.2401544
+##   Intermedias 1.000000 0.0000000
+## 
+##              KitchenQual
+## Y                     Ex         Fa         Gd         TA
+##   Caras       1.00000000 0.00000000 0.00000000 0.00000000
+##   Economicas  0.02073733 0.02995392 0.36751152 0.58179724
+##   Intermedias 0.36486486 0.00000000 0.58783784 0.04729730
+## 
+##              TotRmsAbvGrd
+## Y                  [,1]      [,2]
+##   Caras       10.400000 0.5477226
+##   Economicas   6.246544 1.4477599
+##   Intermedias  7.959459 1.6241309
+## 
+##              Functional
+## Y                    Maj1        Maj2        Min1        Min2         Mod
+##   Caras       0.000000000 0.000000000 0.000000000 0.000000000 0.000000000
+##   Economicas  0.010368664 0.003456221 0.025345622 0.027649770 0.010368664
+##   Intermedias 0.006756757 0.000000000 0.006756757 0.000000000 0.013513514
+##              Functional
+## Y                     Sev         Typ
+##   Caras       0.000000000 1.000000000
+##   Economicas  0.001152074 0.921658986
+##   Intermedias 0.000000000 0.972972973
+## 
+##              Fireplaces
+## Y                  [,1]      [,2]
+##   Caras       1.8000000 0.4472136
+##   Economicas  0.5195853 0.6341557
+##   Intermedias 1.1486486 0.4860624
+## 
+##              GarageType
+## Y                  2Types      Attchd     Basment     BuiltIn     CarPort
+##   Caras       0.000000000 0.800000000 0.000000000 0.200000000 0.000000000
+##   Economicas  0.006172840 0.606172840 0.017283951 0.043209877 0.006172840
+##   Intermedias 0.000000000 0.804054054 0.006756757 0.155405405 0.000000000
+##              GarageType
+## Y                  Detchd
+##   Caras       0.000000000
+##   Economicas  0.320987654
+##   Intermedias 0.033783784
+## 
+##              GarageYrBlt
+## Y                 [,1]     [,2]
+##   Caras       2002.400  6.94982
+##   Economicas  1975.985 23.02940
+##   Intermedias 1997.155 15.97690
+## 
+##              GarageFinish
+## Y                   Fin       RFn       Unf
+##   Caras       1.0000000 0.0000000 0.0000000
+##   Economicas  0.1962963 0.3074074 0.4962963
+##   Intermedias 0.5810811 0.3040541 0.1148649
+## 
+##              GarageCars
+## Y                 [,1]      [,2]
+##   Caras       3.000000 0.0000000
+##   Economicas  1.624424 0.6889825
+##   Intermedias 2.574324 0.5096513
+## 
+##              GarageArea
+## Y                 [,1]      [,2]
+##   Caras       770.6000  71.95693
+##   Economicas  431.9078 190.63710
+##   Intermedias 716.0946 183.52113
+## 
+##              GarageQual
+## Y                      Ex          Fa          Gd          Po          TA
+##   Caras       0.000000000 0.000000000 0.000000000 0.000000000 1.000000000
+##   Economicas  0.002469136 0.037037037 0.004938272 0.002469136 0.953086420
+##   Intermedias 0.006756757 0.006756757 0.020270270 0.000000000 0.966216216
+## 
+##              GarageCond
+## Y                      Ex          Fa          Gd          Po          TA
+##   Caras       0.000000000 0.000000000 0.000000000 0.000000000 1.000000000
+##   Economicas  0.002469136 0.032098765 0.006172840 0.004938272 0.954320988
+##   Intermedias 0.000000000 0.000000000 0.013513514 0.000000000 0.986486486
+## 
+##              PavedDrive
+## Y                      N          P          Y
+##   Caras       0.00000000 0.00000000 1.00000000
+##   Economicas  0.06336406 0.02649770 0.91013825
+##   Intermedias 0.00000000 0.00000000 1.00000000
+## 
+##              WoodDeckSF
+## Y                  [,1]     [,2]
+##   Caras       153.40000 160.7041
+##   Economicas   79.83756 116.2920
+##   Intermedias 174.64865 139.4957
+## 
+##              OpenPorchSF
+## Y                 [,1]     [,2]
+##   Caras       75.00000 21.18962
+##   Economicas  40.26382 61.55150
+##   Intermedias 89.07432 84.33155
+## 
+##              EnclosedPorch
+## Y                  [,1]     [,2]
+##   Caras        0.000000  0.00000
+##   Economicas  23.346774 61.90317
+##   Intermedias  8.810811 40.26162
+## 
+##              X3SsnPorch
+## Y                 [,1]     [,2]
+##   Caras       0.000000  0.00000
+##   Economicas  3.826037 32.48743
+##   Intermedias 4.222973 31.01565
+## 
+##              ScreenPorch
+## Y                 [,1]     [,2]
+##   Caras       34.00000 76.02631
+##   Economicas  14.00922 52.17728
+##   Intermedias 22.33784 75.07534
+## 
+##              PoolArea
+## Y                   [,1]      [,2]
+##   Caras       111.000000 248.20355
+##   Economicas    1.150922  23.98123
+##   Intermedias   4.986486  60.66323
+## 
+##              PoolQC
+## Y              Ex  Fa  Gd
+##   Caras       1.0 0.0 0.0
+##   Economicas  0.0 0.5 0.5
+##   Intermedias 0.0 0.0 1.0
+## 
+##              Fence
+## Y                 GdPrv      GdWo     MnPrv      MnWw
+##   Caras       0.0000000 0.0000000 1.0000000 0.0000000
+##   Economicas  0.1910112 0.2022472 0.5561798 0.0505618
+##   Intermedias 0.2307692 0.2307692 0.5384615 0.0000000
+## 
+##              MiscFeature
+## Y                   Gar2       Othr       Shed       TenC
+##   Caras                                                  
+##   Economicas  0.02564103 0.05128205 0.89743590 0.02564103
+##   Intermedias 0.00000000 0.00000000 1.00000000 0.00000000
+## 
+##              MiscVal
+## Y                 [,1]     [,2]
+##   Caras        0.00000   0.0000
+##   Economicas  49.64747 562.6722
+##   Intermedias 24.66216 193.1212
+## 
+##              MoSold
+## Y                 [,1]     [,2]
+##   Caras       4.400000 2.607681
+##   Economicas  6.240783 2.653082
+##   Intermedias 6.635135 2.833590
+## 
+##              YrSold
+## Y                 [,1]     [,2]
+##   Caras       2007.800 1.643168
+##   Economicas  2007.824 1.340536
+##   Intermedias 2007.804 1.307533
+## 
+##              SaleType
+## Y                     COD         Con       ConLD       ConLI       ConLw
+##   Caras       0.000000000 0.000000000 0.000000000 0.000000000 0.000000000
+##   Economicas  0.033410138 0.000000000 0.006912442 0.003456221 0.003456221
+##   Intermedias 0.000000000 0.006756757 0.000000000 0.006756757 0.000000000
+##              SaleType
+## Y                     CWD         New         Oth          WD
+##   Caras       0.000000000 0.400000000 0.000000000 0.600000000
+##   Economicas  0.002304147 0.056451613 0.002304147 0.891705069
+##   Intermedias 0.006756757 0.263513514 0.000000000 0.716216216
+## 
+##              SaleCondition
+## Y                 Abnorml     AdjLand      Alloca      Family      Normal
+##   Caras       0.200000000 0.000000000 0.000000000 0.000000000 0.400000000
+##   Economicas  0.073732719 0.003456221 0.009216590 0.016129032 0.837557604
+##   Intermedias 0.020270270 0.000000000 0.013513514 0.006756757 0.695945946
+##              SaleCondition
+## Y                 Partial
+##   Caras       0.400000000
+##   Economicas  0.059907834
+##   Intermedias 0.263513514
+## 
+##              SalePrice
+## Y                 [,1]     [,2]
+##   Caras       644647.6 98905.33
+##   Economicas  155054.8 43074.46
+##   Intermedias 315725.5 56162.17
+## 
+##              clasificacion
+## Y             Caras Economicas Intermedias
+##   Caras           1          0           0
+##   Economicas      0          1           0
+##   Intermedias     0          0           1</code></pre>
+<p>Con esto puede observarse que las probabilidades a priori obtenidas
+son: caras 0.4897%, economicas 85.01% e intermedias 14.50%.</p>
+<p>Es decir, la mayoría de casas se encuentra en un rango de precio de
+venta económico, seguido por las casas con un precio de venta intermedio
+y por último se encuentran aquellas con un precio de venta elevado.</p>
+</div>
+<div id="utilice-el-modelo-con-el-conjunto-de-prueba-y-determine-la-eficiencia-del-algoritmo-para-clasificar." class="section level3">
+<h3>4. Utilice el modelo con el conjunto de prueba y determine la
+eficiencia del algoritmo para clasificar.</h3>
+<pre class="r"><code>prediction &lt;- predict(modelo, test)
+prediction</code></pre>
+<pre><code>##   [1] Economicas  Intermedias Intermedias Intermedias Economicas  Intermedias
+##   [7] Economicas  Intermedias Economicas  Economicas  Economicas  Economicas 
+##  [13] Intermedias Economicas  Economicas  Intermedias Economicas  Caras      
+##  [19] Economicas  Economicas  Intermedias Intermedias Intermedias Economicas 
+##  [25] Economicas  Economicas  Economicas  Economicas  Economicas  Intermedias
+##  [31] Economicas  Economicas  Economicas  Economicas  Economicas  Intermedias
+##  [37] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+##  [43] Intermedias Economicas  Economicas  Economicas  Economicas  Economicas 
+##  [49] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+##  [55] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+##  [61] Economicas  Economicas  Intermedias Economicas  Intermedias Economicas 
+##  [67] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+##  [73] Intermedias Economicas  Economicas  Economicas  Economicas  Economicas 
+##  [79] Economicas  Economicas  Economicas  Economicas  Intermedias Economicas 
+##  [85] Economicas  Economicas  Intermedias Economicas  Economicas  Economicas 
+##  [91] Economicas  Economicas  Economicas  Intermedias Economicas  Economicas 
+##  [97] Economicas  Caras       Intermedias Intermedias Economicas  Intermedias
+## [103] Intermedias Intermedias Economicas  Economicas  Economicas  Caras      
+## [109] Intermedias Economicas  Economicas  Economicas  Economicas  Intermedias
+## [115] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+## [121] Economicas  Economicas  Economicas  Caras       Economicas  Economicas 
+## [127] Economicas  Intermedias Economicas  Economicas  Economicas  Intermedias
+## [133] Economicas  Economicas  Economicas  Intermedias Economicas  Economicas 
+## [139] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+## [145] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+## [151] Economicas  Economicas  Economicas  Economicas  Caras       Economicas 
+## [157] Economicas  Economicas  Economicas  Economicas  Intermedias Economicas 
+## [163] Economicas  Intermedias Intermedias Economicas  Intermedias Economicas 
+## [169] Economicas  Intermedias Economicas  Economicas  Economicas  Economicas 
+## [175] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+## [181] Intermedias Economicas  Intermedias Economicas  Economicas  Economicas 
+## [187] Economicas  Intermedias Economicas  Economicas  Intermedias Economicas 
+## [193] Economicas  Economicas  Intermedias Economicas  Economicas  Intermedias
+## [199] Economicas  Caras       Economicas  Economicas  Intermedias Economicas 
+## [205] Economicas  Economicas  Economicas  Caras       Economicas  Intermedias
+## [211] Economicas  Intermedias Economicas  Economicas  Economicas  Economicas 
+## [217] Economicas  Intermedias Economicas  Intermedias Economicas  Intermedias
+## [223] Economicas  Intermedias Economicas  Economicas  Economicas  Economicas 
+## [229] Economicas  Economicas  Caras       Economicas  Economicas  Caras      
+## [235] Intermedias Economicas  Economicas  Economicas  Intermedias Economicas 
+## [241] Intermedias Intermedias Economicas  Economicas  Economicas  Economicas 
+## [247] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+## [253] Economicas  Economicas  Intermedias Economicas  Economicas  Economicas 
+## [259] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+## [265] Economicas  Intermedias Economicas  Economicas  Economicas  Economicas 
+## [271] Economicas  Economicas  Economicas  Economicas  Intermedias Intermedias
+## [277] Economicas  Intermedias Economicas  Economicas  Intermedias Economicas 
+## [283] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+## [289] Intermedias Intermedias Economicas  Economicas  Economicas  Economicas 
+## [295] Economicas  Economicas  Economicas  Economicas  Intermedias Economicas 
+## [301] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+## [307] Economicas  Intermedias Intermedias Economicas  Caras       Economicas 
+## [313] Economicas  Economicas  Intermedias Economicas  Economicas  Economicas 
+## [319] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+## [325] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+## [331] Economicas  Economicas  Economicas  Economicas  Economicas  Intermedias
+## [337] Economicas  Economicas  Economicas  Intermedias Economicas  Economicas 
+## [343] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+## [349] Economicas  Economicas  Economicas  Economicas  Economicas  Intermedias
+## [355] Economicas  Caras       Intermedias Economicas  Economicas  Economicas 
+## [361] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+## [367] Economicas  Intermedias Economicas  Economicas  Economicas  Intermedias
+## [373] Economicas  Economicas  Economicas  Economicas  Economicas  Intermedias
+## [379] Intermedias Economicas  Economicas  Intermedias Caras       Intermedias
+## [385] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+## [391] Economicas  Intermedias Economicas  Economicas  Economicas  Economicas 
+## [397] Economicas  Intermedias Intermedias Economicas  Economicas  Economicas 
+## [403] Economicas  Economicas  Economicas  Intermedias Economicas  Economicas 
+## [409] Caras       Economicas  Economicas  Economicas  Intermedias Caras      
+## [415] Intermedias Economicas  Intermedias Economicas  Economicas  Intermedias
+## [421] Economicas  Intermedias Economicas  Economicas  Economicas  Intermedias
+## [427] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+## [433] Economicas  Economicas  Economicas  Economicas  Economicas  Economicas 
+## [439] Economicas 
+## Levels: Caras Economicas Intermedias</code></pre>
+<p>Se realiza la prediccion empleando el modelo y set de prueba para la
+evaluacion de eficiencia del algoritmo.</p>
+</div>
+<div id="analice-los-resultados-del-modelo-de-regresion-que-tan-bien-le-fue-prediciendo" class="section level3">
+<h3>5. Analice los resultados del modelo de regresion, que tan bien le
+fue prediciendo?</h3>
+</div>
+<div id="compare-los-resultados-con-el-modelo-de-regresión-lineal-y-el-árbol-de-regresión-que-hizo-en-las-hojas-pasadas.-cuál-funcionó-mejor" class="section level3">
+<h3>6.Compare los resultados con el modelo de regresión lineal y el
+árbol de regresión que hizo en las hojas pasadas. ¿Cuál funcionó
+mejor?</h3>
+</div>
+<div id="haga-un-análisis-de-la-eficiencia-del-algoritmo-usando-una-matriz-de-confusión.-tenga-en-cuenta-la-efectividad-donde-el-algoritmo-se-equivocó-más-donde-se-equivocó-menos-y-la-importancia-que-tienen-los-errores." class="section level3">
+<h3>7. Haga un análisis de la eficiencia del algoritmo usando una matriz
+de confusión. Tenga en cuenta la efectividad, donde el algoritmo se
+equivocó más, donde se equivocó menos y la importancia que tienen los
+errores.</h3>
+<pre class="r"><code>library(caret)
+cfm &lt;- confusionMatrix(prediction,as.factor(test$clasificacion))
+cfm</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##              Reference
+## Prediction    Caras Economicas Intermedias
+##   Caras           2          0          12
+##   Economicas      0        339           3
+##   Intermedias     0         38          45
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.8793          
+##                  95% CI : (0.8451, 0.9082)
+##     No Information Rate : 0.8588          
+##     P-Value [Acc &gt; NIR] : 0.1207          
+##                                           
+##                   Kappa : 0.6042          
+##                                           
+##  Mcnemar&#39;s Test P-Value : NA              
+## 
+## Statistics by Class:
+## 
+##                      Class: Caras Class: Economicas Class: Intermedias
+## Sensitivity              1.000000            0.8992             0.7500
+## Specificity              0.972540            0.9516             0.8997
+## Pos Pred Value           0.142857            0.9912             0.5422
+## Neg Pred Value           1.000000            0.6082             0.9579
+## Prevalence               0.004556            0.8588             0.1367
+## Detection Rate           0.004556            0.7722             0.1025
+## Detection Prevalence     0.031891            0.7790             0.1891
+## Balanced Accuracy        0.986270            0.9254             0.8249</code></pre>
+<p>Basado en la matriz de confusion realizada a partir de la prediccion
+y el set de prueba, la precision del modelo para realizar predicciones
+de 0.8656 o 86.56%. El modelo presenta sensibilidad, especificidad y
+exactitud balanceda, aceptables para la clasificacion de caras y
+economicas, sin embargo en la clasificacion de economicas estos
+indicadores presentan menor eficiencia.</p>
+</div>
+<div id="analice-el-modelo.-explique-si-hay-sobreajuste-overfitting-o-no." class="section level3">
+<h3>8. Analice el modelo. Explique si hay sobreajuste (overfitting) o
+no.</h3>
+<p>Al tener un nivel de accurancy alto y porcentajes de comportamiento
+similares, se puede llegar a pensar que el modelo pudo a ver sufrido un
+sobreajuste, pero esto se puede ver realmente comparandolo con otro
+conjunto de datos para comprobar si hubo o no hubo sobreajuste, para
+esto usaremos la validacion cruzada</p>
+</div>
+<div id="haga-un-modelo-usando-validación-cruzada-compare-los-resultados-de-este-con-los-del-modelo-anterior.-cuál-funcionó-mejor" class="section level3">
+<h3>9. Haga un modelo usando validación cruzada, compare los resultados
+de este con los del modelo anterior. ¿Cuál funcionó mejor?</h3>
+<pre class="r"><code>library(h2o)
+h2o.no_progress()
+h2o.init()</code></pre>
+<pre><code>## 
+## H2O is not running yet, starting it now...
+## 
+## Note:  In case of errors look at the following log files:
+##     C:\Users\elean\AppData\Local\Temp\Rtmpgvcf23\file97c79b04cdf/h2o_elean_started_from_r.out
+##     C:\Users\elean\AppData\Local\Temp\Rtmpgvcf23\file97c37e14deb/h2o_elean_started_from_r.err
+## 
+## 
+## Starting H2O JVM and connecting:  Connection successful!
+## 
+## R is connected to the H2O cluster: 
+##     H2O cluster uptime:         2 seconds 875 milliseconds 
+##     H2O cluster timezone:       America/Regina 
+##     H2O data parsing timezone:  UTC 
+##     H2O cluster version:        3.40.0.1 
+##     H2O cluster version age:    1 month and 8 days 
+##     H2O cluster name:           H2O_started_from_R_elean_srz247 
+##     H2O cluster total nodes:    1 
+##     H2O cluster total memory:   3.48 GB 
+##     H2O cluster total cores:    16 
+##     H2O cluster allowed cores:  16 
+##     H2O cluster healthy:        TRUE 
+##     H2O Connection ip:          localhost 
+##     H2O Connection port:        54321 
+##     H2O Connection proxy:       NA 
+##     H2O Internal Security:      FALSE 
+##     R Version:                  R version 4.2.2 (2022-10-31 ucrt)</code></pre>
+<pre class="r"><code>train$SalePrice &lt;- factor(train$SalePrice)
+y &lt;- &quot;SalePrice&quot;
+x &lt;- setdiff(names(train), y)
+train.h2o &lt;- train %&gt;%
+  mutate_if(is.factor, factor, ordered = FALSE) %&gt;%
+  as.h2o()
+nb.h2o &lt;- h2o.naiveBayes(
+  x = x,
+  y = y,
+  training_frame = train.h2o,
+  nfolds = 10,
+  laplace = 0
+)</code></pre>
+<pre><code>## Warning in .h2o.processResponseWarnings(res): Dropping bad and constant columns: [Condition1, Condition2, SaleType, ExterQual, GarageCond, LandContour, LotShape, GarageFinish, Utilities, Street, LandSlope, HouseStyle, Exterior1st, Foundation, HeatingQC, Electrical, Fence, MiscFeature, PoolQC, PavedDrive, BldgType, ExterCond, Exterior2nd, RoofStyle, CentralAir, GarageType, MSZoning, Neighborhood, SaleCondition, Functional, GarageQual, Heating, LotConfig, clasificacion, RoofMatl, KitchenQual].</code></pre>
+<pre class="r"><code>confusionMatrixCV &lt;- h2o.confusionMatrix(nb.h2o)</code></pre>
+<p>matriz de confusion para modelo de validacion cruzada</p>
+<pre class="r"><code>confusionMatrixCV</code></pre>
+<pre><code>## Confusion Matrix: Row labels: Actual class; Column labels: Predicted class
+##        101800 102000 102776 103000 103200 103600 104000 104900 105000 105500
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      1      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        106000 106500 107000 107400 107500 107900 108000 108480 108500 108959
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        109000 109500 109900 110000 110500 111000 111250 112000 113000 114500
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        114504 115000 116000 116500 116900 117000 117500 118000 118500 118964
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      1      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        119000 119200 119500 119750 119900 120000 120500 121000 121500 121600
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        122000 122500 122900 123000 123500 123600 124000 124500 124900 125000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        125500 126000 126500 127000 127500 128000 128200 128500 128900 128950
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        129000 129500 129900 130000 130250 130500 131000 131400 131500 132000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        132250 132500 133000 133500 133700 133900 134000 134432 134900 135000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        135500 135750 135900 136000 136500 136900 136905 137000 137500 138000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        138500 138800 138887 139000 139400 139900 139950 140000 141000 142000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        142125 142500 142953 143000 143250 143500 143750 143900 144000 144152
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        144500 144900 145000 145250 145500 145900 146000 146500 146800 147000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        147500 148000 148500 148800 149000 149300 149350 149500 149700 149900
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        150000 150500 150750 151000 151500 152000 153000 153337 153500 153575
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        153900 154000 154500 154900 155000 155835 155900 156000 156500 156932
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        157000 157500 157900 158000 158900 159000 159434 159895 160000 160200
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        161000 161500 161750 162000 162500 162900 163000 163500 163900 163990
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        164000 164500 164700 164900 164990 165000 165150 165400 165500 165600
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        166000 167000 167240 167500 168000 168500 169000 169500 169900 169990
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        170000 171000 171500 171750 172000 172500 172785 173000 173500 173733
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        173900 174000 174500 175000 175500 175900 176000 176485 176500 177000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        177500 178000 178400 178740 179000 179200 179540 179600 179665 179900
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        180000 180500 181000 181134 181500 181900 182000 183000 183200 183500
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        183900 184750 184900 185000 185500 185850 185900 186000 186500 187000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        187100 187500 187750 188000 188500 188700 189000 189950 190000 191000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        192000 192500 193000 193500 194000 194201 194500 194700 195000 196000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        196500 197000 197500 197900 199900 1e+05 200500 200624 201000 202500
+## 101800      0      0      0      0      0     0      0      0      0      0
+## 102000      0      0      0      0      0     0      0      0      0      0
+## 102776      0      0      0      0      0     0      0      0      0      0
+## 103000      0      0      0      0      0     0      0      0      0      0
+## 103200      0      0      0      0      0     0      0      0      0      0
+##        202665 202900 203000 204000 204750 204900 205000 205950 206300 206900
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        207000 207500 208300 208900 210000 211000 212000 212900 213000 213490
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        213500 214000 214500 214900 215000 216500 217000 217500 219500 220000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        221000 221500 222000 222500 224000 225000 226000 226700 227000 228000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        228500 228950 229000 229456 230000 230500 231500 232000 232600 233000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        233230 234000 235000 235128 236000 236500 237000 238000 239000 239500
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        239900 240000 241000 244000 244400 245000 245350 245500 246578 248000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        248900 249700 250000 251000 252000 253000 253293 254000 254900 256000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        256300 257500 259000 259500 260000 260400 261500 262000 262280 262500
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        263435 264132 264561 265900 266000 267000 268000 269500 269790 270000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        271000 271900 272000 274000 274900 274970 275000 276000 277000 277500
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        278000 280000 281000 281213 282922 283463 284000 285000 286000 287000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        287090 289000 290000 293077 294000 295000 297000 299800 2e+05 301000
+## 101800      0      0      0      0      0      0      0      0     0      0
+## 102000      0      0      0      0      0      0      0      0     0      0
+## 102776      0      0      0      0      0      0      0      0     0      0
+## 103000      0      0      0      0      0      0      0      0     0      0
+## 103200      0      0      0      0      0      0      0      0     0      0
+##        302000 303477 305000 306000 309000 310000 311872 312500 313000 314813
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        315000 315500 315750 318000 319900 320000 324000 325000 325624 326000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        328900 333168 335000 336000 337500 340000 341000 342643 345000 350000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        359100 360000 369900 372402 372500 374000 377426 378500 380000 381000
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        385000 386250 392000 392500 39300 394432 394617 395000 395192 40000
+## 101800      0      0      0      0     0      0      0      0      0     0
+## 102000      0      0      0      0     0      0      0      0      0     0
+## 102776      0      0      0      0     0      0      0      0      0     0
+## 103000      0      0      0      0     0      0      0      0      0     0
+## 103200      0      0      0      0     0      0      0      0      0     0
+##        402861 403000 410000 412500 415298 423000 424870 440000 446261 451950
+## 101800      0      0      0      0      0      0      0      0      0      0
+## 102000      0      0      0      0      0      0      0      0      0      0
+## 102776      0      0      0      0      0      0      0      0      0      0
+## 103000      0      0      0      0      0      0      0      0      0      0
+## 103200      0      0      0      0      0      0      0      0      0      0
+##        475000 501837 52000 52500 538000 55000 555000 556581 55993 58500 60000
+## 101800      0      0     0     0      0     0      0      0     0     0     0
+## 102000      0      0     0     0      0     0      0      0     0     0     0
+## 102776      0      0     0     0      0     0      0      0     0     0     0
+## 103000      0      0     0     0      0     0      0      0     0     0     1
+## 103200      0      0     0     0      0     0      0      0     0     0     1
+##        61000 611657 62383 72500 73000 745000 75500 755000 76000 76500 78000
+## 101800     0      0     0     0     0      0     0      0     0     0     0
+## 102000     0      0     0     0     0      0     0      0     0     0     0
+## 102776     0      0     0     0     0      0     0      0     0     0     0
+## 103000     0      0     0     0     0      0     0      0     0     0     0
+## 103200     0      0     0     0     0      0     0      0     0     0     0
+##        79000 79900 80000 81000 82000 82500 83000 83500 84500 84900 85000 85400
+## 101800     0     0     0     0     1     0     0     0     0     0     0     0
+## 102000     0     0     0     0     1     0     0     0     0     0     0     0
+## 102776     0     0     0     0     0     0     0     0     0     0     0     0
+## 103000     0     0     0     0     0     0     0     0     0     0     0     0
+## 103200     0     0     0     0     0     0     0     0     0     0     0     0
+##        86000 87000 87500 88000 89000 89471 89500 90000 91000 91500 92000 93000
+## 101800     0     0     0     0     0     0     0     0     0     0     0     0
+## 102000     0     0     0     0     0     0     0     0     0     0     0     0
+## 102776     0     0     0     0     0     0     0     0     0     0     0     0
+## 103000     0     0     0     0     0     0     0     0     0     0     0     0
+## 103200     0     0     0     0     0     0     0     0     0     0     0     0
+##        93500 94750 96500 97000 98000 98300 99500 99900  Error          Rate
+## 101800     0     0     0     0     0     0     0     0 1.0000 =       1 / 1
+## 102000     0     0     0     0     0     0     0     0 0.5000 =       1 / 2
+## 102776     0     0     0     0     0     0     0     0 1.0000 =       1 / 1
+## 103000     0     0     0     0     0     0     0     0 1.0000 =       1 / 1
+## 103200     0     0     0     0     0     0     0     0 1.0000 =       1 / 1
+## 
+## ---
+##        101800 102000 102776 103000 103200 103600 104000 104900 105000 105500
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      3      0      0      0      0      1      0     17      0
+##        106000 106500 107000 107400 107500 107900 108000 108480 108500 108959
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      0      4      1      1      0      6      0      0      1
+##        109000 109500 109900 110000 110500 111000 111250 112000 113000 114500
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      1      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0     44      1      0      0      0      0      0      0      1
+##        114504 115000 116000 116500 116900 117000 117500 118000 118500 118964
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      0     21      0      0      1      0      1      1      0
+##        119000 119200 119500 119750 119900 120000 120500 121000 121500 121600
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      1      0      0      0      0      0      1      0      0      1
+##        122000 122500 122900 123000 123500 123600 124000 124500 124900 125000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      1      1      1      4      0      0      0      3      1      0
+##        125500 126000 126500 127000 127500 128000 128200 128500 128900 128950
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      3      1      0      0      0      1      0      4      0      1
+##        129000 129500 129900 130000 130250 130500 131000 131400 131500 132000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      3      0      0      0      3      1      0      2      0
+##        132250 132500 133000 133500 133700 133900 134000 134432 134900 135000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0     89      0      0      0      2      1      0      0      0
+##        135500 135750 135900 136000 136500 136900 136905 137000 137500 138000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      4      0      1      2      1      1      0      0      0      3
+##        138500 138800 138887 139000 139400 139900 139950 140000 141000 142000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      4      0      1      0      0      0      0      0      0      2
+##        142125 142500 142953 143000 143250 143500 143750 143900 144000 144152
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0     39      0      0      1      2      0      0      0      0
+##        144500 144900 145000 145250 145500 145900 146000 146500 146800 147000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      1      0      0      0      0      1     10      1      0      0
+##        147500 148000 148500 148800 149000 149300 149350 149500 149700 149900
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      0      4      0      0      0      0      1      0      4
+##        150000 150500 150750 151000 151500 152000 153000 153337 153500 153575
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      1      0      0      0      0      2      1      0      0
+##        153900 154000 154500 154900 155000 155835 155900 156000 156500 156932
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      0      0      0      0      0      0      4      1      0
+##        157000 157500 157900 158000 158900 159000 159434 159895 160000 160200
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      2      2      3      2      1      1      0      0      0      0
+##        161000 161500 161750 162000 162500 162900 163000 163500 163900 163990
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      1      4      1      0      0      1      4      0      0      0
+##        164000 164500 164700 164900 164990 165000 165150 165400 165500 165600
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      2      0      0      1      0      0      1      0      2      0
+##        166000 167000 167240 167500 168000 168500 169000 169500 169900 169990
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      2      7      0      2      3      1      0      2      0      0
+##        170000 171000 171500 171750 172000 172500 172785 173000 173500 173733
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      1      1      0      1      0      0      1      0      0
+##        173900 174000 174500 175000 175500 175900 176000 176485 176500 177000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      4      0      0      0      0      1      0      1      1
+##        177500 178000 178400 178740 179000 179200 179540 179600 179665 179900
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      2      2      0      0      4      3      0      0      0      2
+##        180000 180500 181000 181134 181500 181900 182000 183000 183200 183500
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      4      0      0      1      1      0      0      0      0
+##        183900 184750 184900 185000 185500 185850 185900 186000 186500 187000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      1      0      0      0      0      0      0     50      3
+##        187100 187500 187750 188000 188500 188700 189000 189950 190000 191000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      4      0      3      0      0      1      1      0      1
+##        192000 192500 193000 193500 194000 194201 194500 194700 195000 196000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0     13      1      3      1      1      1      0      8     48
+##        196500 197000 197500 197900 199900 1e+05 200500 200624 201000 202500
+## 97000       0      0      0      0      0     0      0      0      0      0
+## 98000       0      0      0      0      0     0      0      0      0      0
+## 98300       0      0      0      0      0     0      0      0      0      0
+## 99500       0      0      0      0      0     0      0      0      0      0
+## 99900       0      0      0      0      0     0      0      0      0      0
+## Totals      1      0      3      0      4     0      1      1     12      1
+##        202665 202900 203000 204000 204750 204900 205000 205950 206300 206900
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      0      0      0      0      0      1      0      1      1
+##        207000 207500 208300 208900 210000 211000 212000 212900 213000 213490
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      1      2      0     30      0      5      1      0      1      0
+##        213500 214000 214500 214900 215000 216500 217000 217500 219500 220000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      1      1      0      0      1      0      1      5      0
+##        221000 221500 222000 222500 224000 225000 226000 226700 227000 228000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      3      0     11      0      1      0      7      0      2      2
+##        228500 228950 229000 229456 230000 230500 231500 232000 232600 233000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      6      1      1      0      0      0      0     21      0      0
+##        233230 234000 235000 235128 236000 236500 237000 238000 239000 239500
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      1      0      0     10      0      3      1      4      0
+##        239900 240000 241000 244000 244400 245000 245350 245500 246578 248000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      0      1      2      1      0      0      1      1      2
+##        248900 249700 250000 251000 252000 253000 253293 254000 254900 256000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      0      1      0      0      0      1      0      0      2
+##        256300 257500 259000 259500 260000 260400 261500 262000 262280 262500
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      1      1      1      1      1      0      1      1      0
+##        263435 264132 264561 265900 266000 267000 268000 269500 269790 270000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      1      0      0      0      7      0      2      0      0      1
+##        271000 271900 272000 274000 274900 274970 275000 276000 277000 277500
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      1      1      2      1      1      1      0      1      2      0
+##        278000 280000 281000 281213 282922 283463 284000 285000 286000 287000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      9      1      0      0      1      0      0      7      1      0
+##        287090 289000 290000 293077 294000 295000 297000 299800 2e+05 301000
+## 97000       0      0      0      0      0      0      0      0     0      0
+## 98000       0      0      0      0      0      0      0      0     0      0
+## 98300       0      0      0      0      0      0      0      0     0      0
+## 99500       0      0      0      0      0      0      0      0     0      0
+## 99900       0      0      0      0      0      0      0      0     0      0
+## Totals      0      1      3      1      1      1      1      1     1      1
+##        302000 303477 305000 306000 309000 310000 311872 312500 313000 314813
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      1      0      0      0      2      0      1      1      1
+##        315000 315500 315750 318000 319900 320000 324000 325000 325624 326000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      2      1      0      7      1      1      1      1      0      1
+##        328900 333168 335000 336000 337500 340000 341000 342643 345000 350000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      1      3      1      1      7      1      1      2      9
+##        359100 360000 369900 372402 372500 374000 377426 378500 380000 381000
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      1      1      1      1      1      1      0      1      1      1
+##        385000 386250 392000 392500 39300 394432 394617 395000 395192 40000
+## 97000       0      0      0      0     0      0      0      0      0     0
+## 98000       0      0      0      0     0      0      0      0      0     0
+## 98300       0      0      0      0     0      0      0      0      0     0
+## 99500       0      0      0      0     0      0      0      0      0     0
+## 99900       0      0      0      0     0      0      0      0      0     0
+## Totals      1      1      0      1     0      1      1      0      0     0
+##        402861 403000 410000 412500 415298 423000 424870 440000 446261 451950
+## 97000       0      0      0      0      0      0      0      0      0      0
+## 98000       0      0      0      0      0      0      0      0      0      0
+## 98300       0      0      0      0      0      0      0      0      0      0
+## 99500       0      0      0      0      0      0      0      0      0      0
+## 99900       0      0      0      0      0      0      0      0      0      0
+## Totals      0      1      1      1      1      1      2      1      1      1
+##        475000 501837 52000 52500 538000 55000 555000 556581 55993 58500 60000
+## 97000       0      0     0     0      0     0      0      0     0     0     1
+## 98000       0      0     0     0      0     0      0      0     0     0     0
+## 98300       0      0     0     0      0     0      0      0     0     0     0
+## 99500       0      0     0     0      0     0      0      0     0     0     0
+## 99900       0      0     0     0      0     0      0      0     0     0     1
+## Totals      1      1     0     0      1     1      1      1     0     0    69
+##        61000 611657 62383 72500 73000 745000 75500 755000 76000 76500 78000
+## 97000      0      0     0     0     0      0     0      0     0     0     0
+## 98000      0      0     0     0     0      0     0      0     0     0     0
+## 98300      0      0     0     0     0      0     0      0     0     0     0
+## 99500      0      0     0     0     0      0     0      0     0     0     0
+## 99900      0      0     0     0     0      0     0      0     0     0     0
+## Totals     0      1     0     0     0      1     0      1     0     0     0
+##        79000 79900 80000 81000 82000 82500 83000 83500 84500 84900 85000 85400
+## 97000      0     0     0     0     0     0     0     0     0     0     0     0
+## 98000      0     0     0     0     0     0     0     0     0     0     0     0
+## 98300      0     0     0     0     1     0     0     0     0     0     0     0
+## 99500      0     0     0     0     0     0     0     0     0     0     0     0
+## 99900      0     0     0     0     0     0     0     0     0     0     0     0
+## Totals     4     4     2     5    24     3     3     0    12     0     0     0
+##        86000 87000 87500 88000 89000 89471 89500 90000 91000 91500 92000 93000
+## 97000      0     0     0     0     0     0     0     0     0     0     0     0
+## 98000      0     0     0     0     0     0     0     0     0     0     0     0
+## 98300      0     0     0     0     0     0     0     0     0     0     0     0
+## 99500      0     0     0     0     0     0     0     0     0     0     0     0
+## 99900      0     0     0     0     0     0     0     0     0     0     0     0
+## Totals     4     7     0     2     0     1     1    21     6     4     0     4
+##        93500 94750 96500 97000 98000 98300 99500 99900  Error          Rate
+## 97000      0     0     0     0     0     0     0     0 1.0000 =       1 / 1
+## 98000      0     0     0     0     2     0     0     0 0.3333 =       1 / 3
+## 98300      0     0     0     0     0     0     0     0 1.0000 =       1 / 1
+## 99500      0     0     0     0     0     0     1     0 0.0000 =       0 / 1
+## 99900      0     0     0     0     0     0     0     0 1.0000 =       1 / 1
+## Totals     0     0     0     0     9     0     1     0 0.6523 = 666 / 1,021</code></pre>
+</div>
+<div id="compare-la-eficiencia-del-algoritmo-con-el-resultado-obtenido-con-el-árbol-de-decisión-el-de-clasificación.-cuál-es-mejor-para-predecir-cuál-se-demoró-más-en-procesar" class="section level3">
+<h3>10. Compare la eficiencia del algoritmo con el resultado obtenido
+con el árbol de decisión (el de clasificación). ¿Cuál es mejor para
+predecir? ¿Cuál se demoró más en procesar?</h3>
+<p>En comparacion con el algortimo de clasificacion y de naive bayes, el
+arbol de desicion tiene una mejor rendimiento y es mejor en la
+prediccion de los datos. Ahora con el tiempo naive bayes fue mas rapido
+que la validacion cruzada, aunque esto depende tambien de la cantidad de
+datos que tengamos y tambien de las librerias usadas para el modelo.</p>
 </div>
 
 
