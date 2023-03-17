@@ -8,23 +8,16 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+library(caret)
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+## Dividiendo la data en test y train
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+set.seed(123)
+data <- read.csv("train.csv")
 
-```{r cars}
-summary(cars)
-```
+# partimos el dataset en training (65%) y testing (35%) 
+trainIndex <- createDataPartition(data$target_variable, p = 0.65, list = FALSE)
+training_data <- data[trainIndex, ]
+testing_data <- data[-trainIndex, ]
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
